@@ -13,11 +13,15 @@ import com.usuario.service.feignclients.MotoFeignClient;
 import com.usuario.service.modelos.Carro;
 import com.usuario.service.modelos.Moto;
 import com.usuario.service.repositorio.UsuarioRepository;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UsuarioService {
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private RestTemplate restTemplate;
 
 	@Autowired
 	private CarroFeignClient carroFeignClient;
@@ -37,11 +41,22 @@ public class UsuarioService {
 		Usuario nuevoUsuario = usuarioRepository.save(usuario);
 		return nuevoUsuario;
 	}
+	
+	public List<Carro> getCarros(int usuarioId){
+		List<Carro> carros = restTemplate.getForObject("http://carro-service/carro/usuario/"+usuarioId,List.class);
+		return carros;
+	}
 
 	public Carro saveCarro(int usuarioId, Carro carro) {
 		carro.setUsuarioId(usuarioId);
 		Carro nuevoCarro = carroFeignClient.save(carro);
 		return nuevoCarro;
+	}
+	
+
+	public List<Moto> getMotos(int usuarioId){
+		List<Moto> motos = restTemplate.getForObject("http://moto-service/moto/usuario/"+usuarioId,List.class);
+		return motos;
 	}
 	
 	public Moto saveMoto(int usuarioId,Moto moto) {
